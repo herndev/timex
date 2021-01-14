@@ -77,18 +77,6 @@ class RegistrationFormState extends State<RegistrationForm>{
             height: _bottomSpace
           ),
 					TextFormField(
-						decoration : txtDecoration('Username'),
-						validator: (value){
-							if (value.isEmpty) {
-						      return 'Enter Username';
-						    }
-						    return null;
-						}
-					),
-           SizedBox(
-            height: _bottomSpace
-          ),
-					TextFormField(
 						decoration : txtDecoration('Email'),
 						validator: (value){
 							if (value.isEmpty)
