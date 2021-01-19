@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:http/http.dart';
+import 'package:timex/services/taskservice.dart';
 import 'Task.dart';
 import 'Occurrence.dart';
 import 'User.dart';
@@ -295,7 +297,37 @@ class _MyWeekViewState extends State<MyWeekView> {
                  
                   
         ]
-    )
+    ),
+
+    // SAMPLE QUERIES
+    floatingActionButton: FloatingActionButton(onPressed: ()async{
+      var token = Provider.of<AuthModel>(context,listen:false).token;
+
+      var data = {
+        "task":"Study",
+        "day":"Tuesday",
+        "initial_time":"19:00:00",
+        "end_time":"20:00:00"
+      };
+      var taskId = "0d8fa197-4f3a-4ba3-83bc-d7e4100b6723";
+
+
+      // var res = await userTasks(token);
+      // print(res.data);
+
+      // var res = await newTask(token, data);
+      // print(res.task);
+
+      // var res = await editTask(token, taskId, data);
+      // print(res.message);
+
+      // var res = await getTask(token, taskId);
+      // print(res.data);
+
+      // var res = await deleteTask(token, taskId);
+      // print(res.message);
+
+    }, child: Icon(Icons.add)),
     );
   }
 }
