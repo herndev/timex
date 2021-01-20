@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:pie_chart/pie_chart.dart';
 import 'package:timex/services/taskservice.dart';
 import 'Task.dart';
 import 'Occurrence.dart';
@@ -456,17 +457,28 @@ class _DayViewState extends State<DayView> {
             Container( 
               height: 300,
               width: 300,
-              child: DonutPieChart(listOfTasks)
-              // FutureBuilder(
-              //   future: getTaskOfTheDayChart(context),
-              //   builder: (BuildContext context, AsyncSnapshot snapshot) {
-              //     if(snapshot.hasData){
-              //       return DonutPieChart(listOfTasks);
-              //     }else{
-              //       return SizedBox();
-              //     }
-              //   },
-              // ),
+              child: 
+              // DonutPieChart(listOfTasks)
+              FutureBuilder(
+                future: getTaskOfTheDayChart(context),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if(snapshot.hasData){
+                    print(snapshot.data);
+                    Map<String, double> myTask = new Map<String, double>.from(snapshot.data);
+
+                    if(myTask != null && myTask.isNotEmpty){
+
+                      return PieChart(
+                        dataMap: myTask 
+                      );
+                    }else{
+                      return SizedBox();
+                    }
+                  }else{
+                    return SizedBox();
+                  }
+                },
+              ),
             ),
             Container(
               constraints: BoxConstraints.expand(height: 260),
@@ -705,10 +717,10 @@ class _DayViewState extends State<DayView> {
   }
 
 
-  Future<List<charts.Series<dynamic, int>>> getTaskOfTheDayChart(context) async{
+  Future<Map<String, double>> getTaskOfTheDayChart(context) async{
     var taskList = await getTaskOfTheDay(context);
     
-    final data = [];
+    Map<String, double> data = {};
 
     for (var item in taskList) {
       // Get time difference
@@ -717,17 +729,10 @@ class _DayViewState extends State<DayView> {
       var _diff = tstart.difference(tend);
       var diff = _diff.inHours;
 
-      data.add(new TaskData(item['task'], diff));
+      data[item['task']] = diff.toDouble();
     }
 
-
-    return [
-      new charts.Series<TaskData, int>(
-        id: 'Task',
-        domainFn: (TaskData task, _) => 2,
-        measureFn: (TaskData task, _) => task.time,
-        data: data,
-      )
-    ];
+    print(data.runtimeType);
+    return data;
   }
 }
