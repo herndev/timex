@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:timex/services/taskservice.dart';
 import 'MyHomepage.dart';
 import 'WeekView.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
@@ -24,6 +25,15 @@ class _SecondRouteState extends State<SecondRoute> {
   bool friday = false;
   bool saturday = false;
   bool sunday = false;
+  List days_of_week = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ];
   List<int> days = [];
   Future<TimeOfDay> timeFrom;
   Future<TimeOfDay> timeTo;
@@ -318,8 +328,9 @@ class _SecondRouteState extends State<SecondRoute> {
                   if (this.days.length > 0 &&
                       this.timeFrom != null &&
                       this.timeTo != null) {
-                    createTask();
-                    Navigator.pop(context);
+                    var token = Provider.of<AuthModel>(context,listen:false).token;
+                    createTask(token);
+                    // Navigator.pop(context);
                   }
                 },
                 child: Text(
@@ -336,13 +347,16 @@ class _SecondRouteState extends State<SecondRoute> {
         )));
   }
 
-  void createTask() async {
+  void createTask(token) async {
     for (int day in days) {
       print(day);
     }
+
     DateTime rightNow = new DateTime.now();
     DateTime timeStart;
     DateTime timeEnd;
+
+    // print(this.repeats);
 
     await timeFrom.then((value) => timeStart = new DateTime(
         rightNow.year, rightNow.month, rightNow.day, value.hour, value.minute));
@@ -353,12 +367,28 @@ class _SecondRouteState extends State<SecondRoute> {
     List<DateTime> times = [];
     times.add(timeStart);
     times.add(timeEnd);
-    MyHomePage.theUser
-        .createTask(this.taskName, this.days, times, this.repeats);
-    Navigator.of(context).pop();
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => WeekView()),
-    );
+
+
+    for (int day in days) {
+      var data = {
+        "task": this.taskName,
+        "day": days_of_week[day],
+        "initial_time": timeStart.toString(),
+        "end_time": timeEnd.toString()
+      };
+      print(day);
+      
+      await newTask(token, data);
+    }
+
+    
+    Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+    // MyHomePage.theUser
+    //     .createTask(this.taskName, this.days, times, this.repeats);
+    // Navigator.of(context).pop();
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => WeekView()),
+    // );
   }
 }
